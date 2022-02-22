@@ -1,5 +1,6 @@
 Check for strings that are too long
     End in "..."
+Change centerline when not in all caps mode
 Add checkbox to allow starting boxes from the right
 Code cleanup
 
