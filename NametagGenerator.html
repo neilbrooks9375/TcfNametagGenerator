@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+  <title>TCF Nametag Generator</title>
+</head>
+<body style="background-color:powderblue;">
+<form>
+<label>Name</label>
+<input type="text" id="myNameInput" value="Guest Speaker"/>
+<br />
+<label>Description</label>
+<input type="text" id="myDescriptionInput" value="Tower Community Fellowship"/>
+<br />
+<label>All Caps</label>
+<input type="checkbox" id="myCapsInput" checked="true"/>
+</form>
+<canvas id="myCanvas" width="1920" height="300"/>
+<script type="text/javascript">
+var TOP_BOX_MARGIN_LEFT = 32;
+var TOP_BOX_MARGIN_TOP = 32;
+var TOP_BOX_HEIGHT = 226;
+var TOP_BOX_TEXT_HEIGHT = 77;
+var TOP_BOX_LEANER_LENGTH = 39;
+var BOTTOM_BOX_MARGIN_LEFT = 44;
+var BOTTOM_BOX_MARGIN_TOP = 106;
+var BOTTOM_BOX_HEIGHT = 152;
+var TEXT_MARGIN = 16;
+var TEXT_TOP_HEIGHT = 62;
+var TEXT_BOTTOM_HEIGHT = 130;
+var myCanvas = document.getElementById("myCanvas");
+var context = myCanvas.getContext("2d");
+var drawTopBox = function (descriptionText) {
+  context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
+  var textWidth = context.measureText(descriptionText).width;
+  context.fillStyle = "red";
+  context.beginPath();
+  context.moveTo(TOP_BOX_MARGIN_LEFT, TOP_BOX_MARGIN_TOP);
+  context.lineTo(TOP_BOX_MARGIN_LEFT, TOP_BOX_MARGIN_TOP + TOP_BOX_HEIGHT);
+  context.lineTo(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH, TOP_BOX_MARGIN_TOP + TOP_BOX_HEIGHT);
+  context.lineTo(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH, TOP_BOX_MARGIN_TOP + TOP_BOX_TEXT_HEIGHT);
+  context.lineTo(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN, TOP_BOX_MARGIN_TOP);
+  context.lineTo(TOP_BOX_MARGIN_LEFT, TOP_BOX_MARGIN_TOP);
+  context.closePath();
+  context.fill();
+};
+var getTopBoxWidth = function (descriptionText) {
+  context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
+  var textWidth = context.measureText(descriptionText).width;
+  return TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH;
+};
+var drawBottomBox = function (nameText, descriptionText) {
+  var topBoxLength = getTopBoxWidth(descriptionText);
+  context.font = "bold " + TEXT_BOTTOM_HEIGHT + "px sans-serif";
+  var textWidth = context.measureText(nameText).width;
+  var bottomBoxLength = TEXT_MARGIN + textWidth + TEXT_MARGIN;
+  if (topBoxLength > bottomBoxLength + (BOTTOM_BOX_MARGIN_LEFT - TOP_BOX_MARGIN_LEFT)) {
+    bottomBoxLength = topBoxLength - (BOTTOM_BOX_MARGIN_LEFT - TOP_BOX_MARGIN_LEFT);
+  }
+  context.fillStyle = "white";
+  context.fillRect(BOTTOM_BOX_MARGIN_LEFT, BOTTOM_BOX_MARGIN_TOP, bottomBoxLength, BOTTOM_BOX_HEIGHT);
+};
+var drawTopText = function (descriptionText) {
+  context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
+  context.fillStyle = "white";
+  context.textBaseline = "middle";
+  var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) + (TEXT_TOP_HEIGHT / 12);
+  //var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) ;
+  context.fillText(descriptionText, TOP_BOX_MARGIN_LEFT + TEXT_MARGIN, centerline);
+};
+var drawBottomText = function (nameText) {
+  context.font = "bold " + TEXT_BOTTOM_HEIGHT + "px sans-serif";
+  context.fillStyle = "black";
+  context.textBaseline = "middle";
+  var centerline = BOTTOM_BOX_MARGIN_TOP + (BOTTOM_BOX_HEIGHT / 2) + (TEXT_BOTTOM_HEIGHT / 12);
+  context.fillText(nameText, BOTTOM_BOX_MARGIN_LEFT + TEXT_MARGIN, centerline);
+};
+var drawNametag = function (name, description) {
+  clearCanvas();
+  drawTopBox(description);
+  drawBottomBox(name, description);
+  drawTopText(description);
+  drawBottomText(name);
+};
+var getInputValues = function () {
+  var nameInput = document.getElementById("myNameInput").value.trim();
+  var descriptionInput = document.getElementById("myDescriptionInput").value.trim();
+  var allCapsInput = document.getElementById("myCapsInput").checked;
+  if (allCapsInput) {
+    nameInput = nameInput.toUpperCase();
+    descriptionInput = descriptionInput.toUpperCase();
+  }
+  return [nameInput, descriptionInput];
+};
+var clearCanvas = function () {
+  myCanvas.width = 1920;
+};
+var drawFromInput = function () {
+  [name, description] = getInputValues();
+  drawNametag(name, description);
+};
+drawFromInput();
+var myNameInput = document.getElementById("myNameInput");
+var myDescriptionInput = document.getElementById("myDescriptionInput");
+var myCapsInput = document.getElementById("myCapsInput");
+myNameInput.addEventListener("input", drawFromInput);
+myDescriptionInput.addEventListener("input", drawFromInput);
+myCapsInput.addEventListener("input", drawFromInput);
+</script>
+</body>
+</html>
+
