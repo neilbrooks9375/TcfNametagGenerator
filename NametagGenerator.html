@@ -84,27 +84,27 @@ var drawBottomBox = function (nameText, descriptionText) {
   context.fillStyle = "white";
   context.fillRect(BOTTOM_BOX_MARGIN_LEFT, BOTTOM_BOX_MARGIN_TOP, bottomBoxLength, BOTTOM_BOX_HEIGHT);
 };
-var drawTopText = function (descriptionText) {
+var drawTopText = function (descriptionText, caps) {
   context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
   context.fillStyle = "white";
   context.textBaseline = "middle";
-  var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) + (TEXT_TOP_HEIGHT / 12);
+  var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) + (caps ? (TEXT_TOP_HEIGHT / 12) : 0);
   //var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) ;
   context.fillText(descriptionText, TOP_BOX_MARGIN_LEFT + TEXT_MARGIN, centerline);
 };
-var drawBottomText = function (nameText) {
+var drawBottomText = function (nameText, caps) {
   context.font = "bold " + TEXT_BOTTOM_HEIGHT + "px sans-serif";
   context.fillStyle = "black";
   context.textBaseline = "middle";
-  var centerline = BOTTOM_BOX_MARGIN_TOP + (BOTTOM_BOX_HEIGHT / 2) + (TEXT_BOTTOM_HEIGHT / 12);
+  var centerline = BOTTOM_BOX_MARGIN_TOP + (BOTTOM_BOX_HEIGHT / 2) + (caps ? (TEXT_BOTTOM_HEIGHT / 12) : 0);
   context.fillText(nameText, BOTTOM_BOX_MARGIN_LEFT + TEXT_MARGIN, centerline);
 };
-var drawNametag = function (name, description) {
+var drawNametag = function (name, description, caps) {
   clearCanvas();
   drawTopBox(description);
   drawBottomBox(name, description);
-  drawTopText(description);
-  drawBottomText(name);
+  drawTopText(description, caps);
+  drawBottomText(name, caps);
 };
 var getInputValues = function () {
   var nameInput = document.getElementById("myNameInput").value.trim();
@@ -116,14 +116,14 @@ var getInputValues = function () {
   }
   descriptionInput = shortenTopText(descriptionInput);
   nameInput = shortenBottomText(nameInput);
-  return [nameInput, descriptionInput];
+  return [nameInput, descriptionInput, allCapsInput];
 };
 var clearCanvas = function () {
   myCanvas.width = CANVAS_WIDTH;
 };
 var drawFromInput = function () {
-  [name, description] = getInputValues();
-  drawNametag(name, description);
+  [name, description, caps] = getInputValues();
+  drawNametag(name, description, caps);
 };
 drawFromInput();
 var myNameInput = document.getElementById("myNameInput");
