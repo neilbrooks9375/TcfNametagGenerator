@@ -27,6 +27,7 @@ var BOTTOM_BOX_HEIGHT = 152;
 var TEXT_MARGIN = 16;
 var TEXT_TOP_HEIGHT = 62;
 var TEXT_BOTTOM_HEIGHT = 130;
+var CANVAS_WIDTH = 1920;
 var myCanvas = document.getElementById("myCanvas");
 var context = myCanvas.getContext("2d");
 var drawTopBox = function (descriptionText) {
@@ -47,6 +48,30 @@ var getTopBoxWidth = function (descriptionText) {
   context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
   var textWidth = context.measureText(descriptionText).width;
   return TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH;
+};
+var shortenTopText = function (descriptionText) {
+  var maxWidth = CANVAS_WIDTH - TOP_BOX_MARGIN_LEFT - TEXT_MARGIN - TEXT_MARGIN - TOP_BOX_LEANER_LENGTH;
+  context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
+  var textWidth = context.measureText(descriptionText).width;
+  var ellipseRequired = false;
+  while (textWidth > maxWidth) {
+    ellipseRequired = true;
+    descriptionText = descriptionText.substring(0, descriptionText.length - 1);
+    textWidth = context.measureText(descriptionText + "...").width;
+  }
+  return descriptionText + (ellipseRequired ? "..." : "");
+};
+var shortenBottomText = function (nameText) {
+  var maxWidth = CANVAS_WIDTH - BOTTOM_BOX_MARGIN_LEFT - TEXT_MARGIN - TEXT_MARGIN;
+  context.font = "bold " + TEXT_BOTTOM_HEIGHT + "px sans-serif";
+  var textWidth = context.measureText(nameText).width;
+  var ellipseRequired = false;
+  while (textWidth > maxWidth) {
+    ellipseRequired = true;
+    nameText = nameText.substring(0, nameText.length - 1);
+    textWidth = context.measureText(nameText + "...").width;
+  }
+  return nameText + (ellipseRequired ? "..." : "");
 };
 var drawBottomBox = function (nameText, descriptionText) {
   var topBoxLength = getTopBoxWidth(descriptionText);
@@ -89,10 +114,12 @@ var getInputValues = function () {
     nameInput = nameInput.toUpperCase();
     descriptionInput = descriptionInput.toUpperCase();
   }
+  descriptionInput = shortenTopText(descriptionInput);
+  nameInput = shortenBottomText(nameInput);
   return [nameInput, descriptionInput];
 };
 var clearCanvas = function () {
-  myCanvas.width = 1920;
+  myCanvas.width = CANVAS_WIDTH;
 };
 var drawFromInput = function () {
   [name, description] = getInputValues();
