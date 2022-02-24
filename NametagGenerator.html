@@ -18,6 +18,9 @@
 <br />
 <label>All Caps</label>
 <input type="checkbox" id="myCapsInput" checked="true"/>
+<br />
+<label>Flip</label>
+<input type="checkbox" id="myFlipInput"/>
 </form>
 <canvas id="myCanvas" width="1920" height="300"/>
 <script type="text/javascript">
@@ -35,17 +38,21 @@ var TEXT_BOTTOM_HEIGHT = 130;
 var CANVAS_WIDTH = 1920;
 var myCanvas = document.getElementById("myCanvas");
 var context = myCanvas.getContext("2d");
-var drawTopBox = function (descriptionText) {
+var flipX = function (xcor, flip) {
+  if (flip) return CANVAS_WIDTH - xcor;
+  return xcor;
+};
+var drawTopBox = function (descriptionText, flip) {
   context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
   var textWidth = context.measureText(descriptionText).width;
   context.fillStyle = "red";
   context.beginPath();
-  context.moveTo(TOP_BOX_MARGIN_LEFT, TOP_BOX_MARGIN_TOP);
-  context.lineTo(TOP_BOX_MARGIN_LEFT, TOP_BOX_MARGIN_TOP + TOP_BOX_HEIGHT);
-  context.lineTo(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH, TOP_BOX_MARGIN_TOP + TOP_BOX_HEIGHT);
-  context.lineTo(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH, TOP_BOX_MARGIN_TOP + TOP_BOX_TEXT_HEIGHT);
-  context.lineTo(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN, TOP_BOX_MARGIN_TOP);
-  context.lineTo(TOP_BOX_MARGIN_LEFT, TOP_BOX_MARGIN_TOP);
+  context.moveTo(flipX(TOP_BOX_MARGIN_LEFT, flip), TOP_BOX_MARGIN_TOP);
+  context.lineTo(flipX(TOP_BOX_MARGIN_LEFT, flip), TOP_BOX_MARGIN_TOP + TOP_BOX_HEIGHT);
+  context.lineTo(flipX(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH, flip), TOP_BOX_MARGIN_TOP + TOP_BOX_HEIGHT);
+  context.lineTo(flipX(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN + TOP_BOX_LEANER_LENGTH, flip), TOP_BOX_MARGIN_TOP + TOP_BOX_TEXT_HEIGHT);
+  context.lineTo(flipX(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN + textWidth + TEXT_MARGIN, flip), TOP_BOX_MARGIN_TOP);
+  context.lineTo(flipX(TOP_BOX_MARGIN_LEFT, flip), TOP_BOX_MARGIN_TOP);
   context.closePath();
   context.fill();
 };
@@ -78,7 +85,7 @@ var shortenBottomText = function (nameText) {
   }
   return nameText + (ellipseRequired ? "..." : "");
 };
-var drawBottomBox = function (nameText, descriptionText) {
+var drawBottomBox = function (nameText, descriptionText, flip) {
   var topBoxLength = getTopBoxWidth(descriptionText);
   context.font = "bold " + TEXT_BOTTOM_HEIGHT + "px sans-serif";
   var textWidth = context.measureText(nameText).width;
@@ -87,56 +94,60 @@ var drawBottomBox = function (nameText, descriptionText) {
     bottomBoxLength = topBoxLength - (BOTTOM_BOX_MARGIN_LEFT - TOP_BOX_MARGIN_LEFT);
   }
   context.fillStyle = "white";
-  context.fillRect(BOTTOM_BOX_MARGIN_LEFT, BOTTOM_BOX_MARGIN_TOP, bottomBoxLength, BOTTOM_BOX_HEIGHT);
+  context.fillRect(flipX(BOTTOM_BOX_MARGIN_LEFT, flip), BOTTOM_BOX_MARGIN_TOP, flip ? 0 - bottomBoxLength : bottomBoxLength, BOTTOM_BOX_HEIGHT);
 };
-var drawTopText = function (descriptionText, caps) {
+var drawTopText = function (descriptionText, caps, flip) {
   context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
   context.fillStyle = "white";
   context.textBaseline = "middle";
+  context.textAlign = flip ? "end" : "start";
   var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) + (caps ? (TEXT_TOP_HEIGHT / 12) : 0);
-  //var centerline = TOP_BOX_MARGIN_TOP + ((BOTTOM_BOX_MARGIN_TOP - TOP_BOX_MARGIN_TOP) / 2) ;
-  context.fillText(descriptionText, TOP_BOX_MARGIN_LEFT + TEXT_MARGIN, centerline);
+  context.fillText(descriptionText, flipX(TOP_BOX_MARGIN_LEFT + TEXT_MARGIN, flip), centerline);
 };
-var drawBottomText = function (nameText, caps) {
+var drawBottomText = function (nameText, caps, flip) {
   context.font = "bold " + TEXT_BOTTOM_HEIGHT + "px sans-serif";
   context.fillStyle = "black";
   context.textBaseline = "middle";
+  context.textAlign = flip ? "end" : "start";
   var centerline = BOTTOM_BOX_MARGIN_TOP + (BOTTOM_BOX_HEIGHT / 2) + (caps ? (TEXT_BOTTOM_HEIGHT / 12) : 0);
-  context.fillText(nameText, BOTTOM_BOX_MARGIN_LEFT + TEXT_MARGIN, centerline);
+  context.fillText(nameText, flipX(BOTTOM_BOX_MARGIN_LEFT + TEXT_MARGIN, flip), centerline);
 };
-var drawNametag = function (name, description, caps) {
+var drawNametag = function (name, description, caps, flip) {
   clearCanvas();
-  drawTopBox(description);
-  drawBottomBox(name, description);
-  drawTopText(description, caps);
-  drawBottomText(name, caps);
+  drawTopBox(description, flip);
+  drawBottomBox(name, description, flip);
+  drawTopText(description, caps, flip);
+  drawBottomText(name, caps, flip);
 };
 var getInputValues = function () {
   var nameInput = document.getElementById("myNameInput").value.trim();
   var descriptionInput = document.getElementById("myDescriptionInput").value.trim();
   var allCapsInput = document.getElementById("myCapsInput").checked;
+  var flipImageInput = document.getElementById("myFlipInput").checked;
   if (allCapsInput) {
     nameInput = nameInput.toUpperCase();
     descriptionInput = descriptionInput.toUpperCase();
   }
   descriptionInput = shortenTopText(descriptionInput);
   nameInput = shortenBottomText(nameInput);
-  return [nameInput, descriptionInput, allCapsInput];
+  return [nameInput, descriptionInput, allCapsInput, flipImageInput];
 };
 var clearCanvas = function () {
   myCanvas.width = CANVAS_WIDTH;
 };
 var drawFromInput = function () {
-  [name, description, caps] = getInputValues();
-  drawNametag(name, description, caps);
+  [name, description, caps, flip] = getInputValues();
+  drawNametag(name, description, caps, flip);
 };
 drawFromInput();
 var myNameInput = document.getElementById("myNameInput");
 var myDescriptionInput = document.getElementById("myDescriptionInput");
 var myCapsInput = document.getElementById("myCapsInput");
+var myFlipInput = document.getElementById("myFlipInput");
 myNameInput.addEventListener("input", drawFromInput);
 myDescriptionInput.addEventListener("input", drawFromInput);
 myCapsInput.addEventListener("input", drawFromInput);
+myFlipInput.addEventListener("input", drawFromInput);
 </script>
 </body>
 </html>
