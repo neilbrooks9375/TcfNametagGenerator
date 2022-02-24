@@ -24,6 +24,8 @@
 </form>
 <canvas id="myCanvas" width="1920" height="300"/>
 <script type="text/javascript">
+
+// Constants
 var TOP_BOX_MARGIN_LEFT = 32;
 var TOP_BOX_MARGIN_TOP = 32;
 var TOP_BOX_HEIGHT = 226;
@@ -36,11 +38,26 @@ var TEXT_MARGIN = 16;
 var TEXT_TOP_HEIGHT = 62;
 var TEXT_BOTTOM_HEIGHT = 130;
 var CANVAS_WIDTH = 1920;
+
+// Canvas, context
 var myCanvas = document.getElementById("myCanvas");
 var context = myCanvas.getContext("2d");
-var flipX = function (xcor, flip) {
-  if (flip) return CANVAS_WIDTH - xcor;
-  return xcor;
+
+
+var drawFromInput = function () {
+  [name, description, caps, flip] = getInputValues();
+  drawNametag(name, description, caps, flip);
+};
+var drawNametag = function (name, description, caps, flip) {
+  clearCanvas();
+  drawTopBox(description, flip);
+  drawBottomBox(name, description, flip);
+  drawTopText(description, caps, flip);
+  drawBottomText(name, caps, flip);
+};
+var clearCanvas = function () {
+  // setting canvas dimensions automatically causes a clear canvas
+  myCanvas.width = CANVAS_WIDTH;
 };
 var drawTopBox = function (descriptionText, flip) {
   context.font = "bold " + TEXT_TOP_HEIGHT + "px sans-serif";
@@ -112,13 +129,6 @@ var drawBottomText = function (nameText, caps, flip) {
   var centerline = BOTTOM_BOX_MARGIN_TOP + (BOTTOM_BOX_HEIGHT / 2) + (caps ? (TEXT_BOTTOM_HEIGHT / 12) : 0);
   context.fillText(nameText, flipX(BOTTOM_BOX_MARGIN_LEFT + TEXT_MARGIN, flip), centerline);
 };
-var drawNametag = function (name, description, caps, flip) {
-  clearCanvas();
-  drawTopBox(description, flip);
-  drawBottomBox(name, description, flip);
-  drawTopText(description, caps, flip);
-  drawBottomText(name, caps, flip);
-};
 var getInputValues = function () {
   var nameInput = document.getElementById("myNameInput").value.trim();
   var descriptionInput = document.getElementById("myDescriptionInput").value.trim();
@@ -132,13 +142,13 @@ var getInputValues = function () {
   nameInput = shortenBottomText(nameInput);
   return [nameInput, descriptionInput, allCapsInput, flipImageInput];
 };
-var clearCanvas = function () {
-  myCanvas.width = CANVAS_WIDTH;
+// Function to flip an x-coordinate to the other side of the canvas if needed
+var flipX = function (xcor, flip) {
+  if (flip) return CANVAS_WIDTH - xcor;
+  return xcor;
 };
-var drawFromInput = function () {
-  [name, description, caps, flip] = getInputValues();
-  drawNametag(name, description, caps, flip);
-};
+
+// Initialization
 drawFromInput();
 var myNameInput = document.getElementById("myNameInput");
 var myDescriptionInput = document.getElementById("myDescriptionInput");
